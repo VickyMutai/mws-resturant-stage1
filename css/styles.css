@@ -370,7 +370,7 @@ nav h1 a {
     height: 80px;
   }
 }
-@media (max-width:699px){
+@media (max-width:850px){
   /* ====================== Restaurant Details ====================== */
 /* for resturant info page */
 .inside header {
@@ -440,6 +440,7 @@ nav h1 a {
   padding-top: 700px;
   position: relative;
   width: 100%;
+  padding-right: 30%;
 }
 #reviews-container {
   padding-top: 30px;
