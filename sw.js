@@ -17,6 +17,7 @@ self.addEventListener('install',function(event){
                 './img/8.jpg',
                 './img/9.jpg',
                 './img/10.jpg',
+                'img/favicon.png',
                 // './img/marker-icon-2x-red.png',
                 // './img/marker-shadow.png',
                 // './js/idb.js',
