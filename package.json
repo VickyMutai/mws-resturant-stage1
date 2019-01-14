@@ -22,5 +22,8 @@
   "homepage": "https://github.com/VickyMutai/mws-resturant-stage1#readme",
   "devDependencies": {
     "gulp": "^4.0.0"
+  },
+  "dependencies": {
+    "idb": "^3.0.2"
   }
 }

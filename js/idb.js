@@ -1,1 +1,0 @@
-import { openDb, deleteDb } from 'idb';
