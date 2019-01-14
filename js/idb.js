@@ -1,3 +1,1 @@
-import idb from 'idb';
-
-await idb.open(…);
+import { openDb, deleteDb } from 'idb';

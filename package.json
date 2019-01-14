@@ -1,0 +1,26 @@
+{
+  "name": "mws-restaurant-stage-1",
+  "version": "1.0.0",
+  "description": "A website for restaurant reviews",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VickyMutai/mws-resturant-stage1.git"
+  },
+  "keywords": [
+    "Restaurant",
+    "reviews"
+  ],
+  "author": "Victoria Mutai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VickyMutai/mws-resturant-stage1/issues"
+  },
+  "homepage": "https://github.com/VickyMutai/mws-resturant-stage1#readme",
+  "devDependencies": {
+    "gulp": "^4.0.0"
+  }
+}
