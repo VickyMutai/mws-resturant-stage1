@@ -1,61 +1,120 @@
-self.addEventListener('install',function(event){
-    event.waitUntil(
-        caches.open('restaurant-review-v1').then(function(cache){
-            return cache.addAll( [
-                '/',
-                'index.html',
-                'restaurant.html',
-                'sw.js',
-                'css/styles.css',
-                'img/1.jpg',
-                'img/2.jpg',
-                'img/3.jpg',
-                'img/4.jpg',
-                'img/5.jpg',
-                'img/6.jpg',
-                'img/7.jpg',
-                'img/8.jpg',
-                'img/9.jpg',
-                'img/10.jpg',
-                'img/favicon.png',
-                // './img/marker-icon-2x-red.png',
-                //'img/marker-shadow.png',
-                // './js/idb.js',
-                'js/dbhelper.js',
-                'js/indexController.js',
-                // './js/bouncemarker.js',
-                'js/main.js',
-                'js/restaurant_info.js',
-                'http://localhost:1337/restaurants/',
-                'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js',
-                'https://fonts.googleapis.com/css?family=Open+Sans:300,400',
-                'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
-                'https://api.tiles.mapbox.com/v4/mapbox.streets/12/1204/1540.jpg70?access_token=pk.eyJ1Ijoidmlja3l2aWNreSIsImEiOiJjanFmbHVpMnEwMWh5M3htb2F5dnI1YWg3In0.ig7hJr8q7FKNkS_KIFXPT',
-            ]
-            );
-            console.log("working")
-        })
-    );
-});
-self.addEventListener('fetch', function(event){
-    event.respondWith(
-        caches.match(event.request).then(function(response){
-          if(response) return response;
-          return fetch(event.request);  
-        })
-    );   
-});
-self.addEventListener('activate',function(event){
-    event.waitUntil(
-        caches.keys().then(function(cacheNames){
-            return Promise.all(
-                cacheNames.filter(function(cacheName){
-                    return cacheName.startsWith('restaurant-')&& cacheName != 'restaurant-review-v1';
-                }).map(function(cacheName){
-                    return cache.delete(cacheName);
-                })
-            );
+importScripts('/js/idb.js');
 
-        })
-    );
+let staticCacheName = 'rreview-1.1.0';
+let DBName = 'rreview';
+let DBVersion = 1;
+let dbPromise;
+
+
+self.addEventListener('activate',  event => {
+  event.waitUntil((function(){
+    self.clients.claim();
+    initDB();
+  })());
 });
+
+
+self.addEventListener('fetch', function(event) {
+  if (event.request.url.indexOf('localhost:1337') >= 0){
+    event.respondWith(
+      dbPromise.then(function (db) {
+        var tx = db.transaction('restaurants', 'readonly');
+        var store = tx.objectStore('restaurants');
+        return store.getAll();
+      }).then(function (items) {
+        if (!items.length) {
+          return fetch(event.request).then(function (response) {
+            return response.clone().json().then(json => {
+              console.log('event respond fetch from net');
+              addAllData(json);
+              return response;
+            })
+          });
+        } else {
+          console.log('event respond read from DB');
+          let response = new Response(JSON.stringify(items), {
+            headers: new Headers({
+              'Content-type': 'application/json',
+              'Access-Control-Allow-Credentials': 'true'
+            }),
+            type: 'cors',
+            status: 200
+          });
+          return response;
+        }
+      })
+    );
+
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+
+      if (response) {
+        console.log('Found ', event.request.url, ' in cache');
+        return response;
+      }
+      return fetch(event.request)
+        .then(function(response) {
+          return caches.open(staticCacheName).then(function(cache) {
+            if (event.request.url.indexOf('maps') < 0) { 
+              cache.put(event.request.url, response.clone());
+            }
+            return response;
+          });
+        });
+
+    }).catch(function(error) {
+      console.log('offline');
+    })
+  );
+});
+
+self.addEventListener('activate', function(event) {
+  console.log('Activating new service worker...');
+
+  let cacheWhitelist = [staticCacheName];
+
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+
+
+function initDB() {
+  dbPromise = idb.open(DBName, DBVersion, function (upgradeDb) {
+    console.log('making DB Store');
+    if (!upgradeDb.objectStoreNames.contains('restaurants')) {
+      upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+    }
+  });
+}
+
+function addAllData(rlist) {
+  let tx;
+  dbPromise.then(function(db) {
+    tx = db.transaction('restaurants', 'readwrite');
+    var store = tx.objectStore('restaurants');
+    rlist.forEach(function(res) {
+      console.log('adding', res);
+      store.put(res);
+    });
+    return tx.complete;
+  }).then(function() {
+    console.log('All data added to DB successfully');
+  }).catch(function(err) {
+    tx.abort();
+    console.log('error in DB adding', err);
+    return false;
+  });
+}
