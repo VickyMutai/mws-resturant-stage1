@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
   <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
   <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  
   <link rel="manifest" href="/manifest.json">
   <title>Restaurant Info</title>
 </head>
@@ -50,9 +51,30 @@
     </section>
     <!-- end restaurant -->
     <!-- Beginning reviews -->
+    <section id="write-review">
+        <h3 tabindex="0">Add your Review</h3>
+        <form action="" id="write-review">
+          <input type="text" placeholder="Name" id="name" aria-label="Review Author Name">
+          <br>
+          <select name="rating" id="rating" aria-label="Rating">
+            <option value="none" disabled selected>Rating</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <br>
+          <textarea name="comment" id="comment" cols="40" rows="10" placeholder="Write your review here.." aria-label="Review"></textarea>
+          <br>
+          <input type="submit" id="submit">
+          <br>
+        </form>
+      </section>
     <section id="reviews-container">
       <ul id="reviews-list" role="list"></ul>
     </section>
+
     <!-- End reviews -->
   </main>
   <!-- End main -->

@@ -75,6 +75,27 @@ fetchRestaurantFromURL = (callback) => {
     });
   }
 }
+
+/*
+ * fetch reviews
+ */
+fetchReviews = () => {
+  const id = getParameterByName('id');
+  if (!id) {
+    console.log('No ID in URL');
+    return;
+  }
+  DBHelper.fetchReviewsForRestaurant(id, (err, reviews) => {
+    self.reviews = reviews;
+    if (err || !reviews) {
+      console.log('reviews fetch error', err);
+      return;
+    }
+    fillReviewsHTML();
+  });
+}
+
+
 /*
  * set favorite button
  */
@@ -139,7 +160,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -163,12 +184,13 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  */
 createReviewHTML = (review) => {
   const li = document.createElement('li');
+  li.setAttribute('role', 'listitem');
   const name = document.createElement('p');
   name.innerHTML = review.name;
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = getHumanDate(review.createdAt);
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -235,3 +257,37 @@ navigator.serviceWorker.ready.then(function (swRegistration) {
     // finish
   });
 });
+navigator.serviceWorker.ready.then(function (swRegistration) {
+  let form = document.querySelector('#write-review');
+  // listen to submit event
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let rating = form.querySelector('#rating');
+    let review = {
+      restaurant_id: getParameterByName('id'),
+      name: form.querySelector('#name').value,
+      rating: rating.options[rating.selectedIndex].value,
+      comments: form.querySelector('#comment').value
+    };
+    console.log(review);
+    // save to DB
+    idb.open('review', 1, function (upgradeDb) {
+      upgradeDb.createObjectStore('outbox', { autoIncrement: true, keyPath: 'id' });
+    }).then(function (db) {
+      var transaction = db.transaction('outbox', 'readwrite');
+      return transaction.objectStore('outbox').put(review);
+    }).then(function () {
+      form.reset();
+      // register for sync and clean up the form
+      return swRegistration.sync.register('sync').then(() => {
+        console.log('Sync registered');
+        // add review to view (for better UX)
+        // const ul = document.getElementById('reviews-list');
+        // review.createdAt = new Date();
+        // ul.appendChild(createReviewHTML(review));
+      });
+    });
+    // finish
+  });
+});
+
