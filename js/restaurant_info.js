@@ -1,5 +1,6 @@
 let restaurant;
 var newMap;
+let reviews;
 
 /**
  * Initialize map as soon as the page is loaded.
@@ -190,7 +191,7 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = getHumanDate(review.createdAt);
+  //date.innerHTML = getHumanDate(review.createdAt);
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -242,10 +243,10 @@ navigator.serviceWorker.ready.then(function (swRegistration) {
     };
     // save to DB
     idb.open('favorite', 1, function (upgradeDb) {
-      upgradeDb.createObjectStore('outbox', { autoIncrement: true, keyPath: 'id' });
+      upgradeDb.createObjectStore('reviewsnfavs', { autoIncrement: true, keyPath: 'id' });
     }).then(function (db) {
-      var transaction = db.transaction('outbox', 'readwrite');
-      return transaction.objectStore('outbox').put(res);
+      var transaction = db.transaction('reviewsnfavs', 'readwrite');
+      return transaction.objectStore('reviewsnfavs').put(res);
     }).then(function () {
       setFavoriteButton(opposite);
       self.restaurant.is_favorite = opposite;
@@ -272,19 +273,18 @@ navigator.serviceWorker.ready.then(function (swRegistration) {
     console.log(review);
     // save to DB
     idb.open('review', 1, function (upgradeDb) {
-      upgradeDb.createObjectStore('outbox', { autoIncrement: true, keyPath: 'id' });
+      upgradeDb.createObjectStore('reviewsnfavs', { autoIncrement: true, keyPath: 'id' });
     }).then(function (db) {
-      var transaction = db.transaction('outbox', 'readwrite');
-      return transaction.objectStore('outbox').put(review);
+      var transaction = db.transaction('reviewsnfavs', 'readwrite');
+      return transaction.objectStore('reviewsnfavs').put(review);
     }).then(function () {
-      form.reset();
       // register for sync and clean up the form
       return swRegistration.sync.register('sync').then(() => {
         console.log('Sync registered');
         // add review to view (for better UX)
-        // const ul = document.getElementById('reviews-list');
+        const ul = document.getElementById('reviews-list');
         // review.createdAt = new Date();
-        // ul.appendChild(createReviewHTML(review));
+        ul.appendChild(createReviewHTML(review));
       });
     });
     // finish

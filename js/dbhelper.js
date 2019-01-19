@@ -187,6 +187,7 @@ class DBHelper {
 static fetchReviewsForRestaurant(id, callback) {
   fetch('http://localhost:1337/reviews/?restaurant_id=' + id).then(response => {
     if (response.status === 200) {
+      console.log('we are on');
       response.json().then(json => {
         callback(null, json);
       }).catch(err => {

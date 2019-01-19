@@ -141,8 +141,8 @@ self.addEventListener('sync', function (event) {
   
   function sendFavorites() {
     return idb.open('favorite', 1).then(db => {
-      let tx = db.transaction('outbox', 'readonly');
-      return tx.objectStore('outbox').getAll();
+      let tx = db.transaction('reviewsnfavs', 'readonly');
+      return tx.objectStore('reviewsnfavs').getAll();
     }).then(items => {
       return Promise.all(items.map(item => {
         let id = item.id;
@@ -159,8 +159,8 @@ self.addEventListener('sync', function (event) {
           if (data) {
             // delete from db
             idb.open('favorite', 1).then(db => {
-              let tx = db.transaction('outbox', 'readwrite');
-              return tx.objectStore('outbox').delete(id);
+              let tx = db.transaction('reviewsnfavs', 'readwrite');
+              return tx.objectStore('reviewsnfavs').delete(id);
             });
           }
         });
@@ -170,8 +170,8 @@ self.addEventListener('sync', function (event) {
   
   function sendReviews() {
     return idb.open('review', 1).then(db => {
-      let tx = db.transaction('outbox', 'readonly');
-      return tx.objectStore('outbox').getAll();
+      let tx = db.transaction('reviewsnfavs', 'readonly');
+      return tx.objectStore('reviewsnfavs').getAll();
     }).then(reviews => {
       return Promise.all(reviews.map(review => {
         let reviewID = review.id;
@@ -193,8 +193,8 @@ self.addEventListener('sync', function (event) {
           if (data) {
             // delete from db
             idb.open('review', 1).then(db => {
-              let tx = db.transaction('outbox', 'readwrite');
-              return tx.objectStore('outbox').delete(reviewID);
+              let tx = db.transaction('reviewsnfavs', 'readwrite');
+              return tx.objectStore('reviewsnfavs').delete(reviewID);
             });
           }
         });
