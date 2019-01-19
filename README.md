@@ -1,6 +1,6 @@
 # Mobile Web Specialist Certification Course
 
-First, run the stage 2 server from https://github.com/udacity/mws-restaurant-stage-2.
+First, run the stage 3 server from https://github.com/udacity/mws-restaurant-stage-3.
 
 Then, run this project as - 
 
@@ -9,10 +9,10 @@ python -m SimpleHTTPServer
 ```
 
 
-### Optimization Techniques Used
-1. Optimize offscreen images
-2. Added aria labels
-3. Optimize for PWA by adding a manifest.json.
+### Improvements Made
+1. Review Form
+2. Favorite/Unfavorite button added
+3. Optimize for PWA.
 
 
 ### Past Stages of this project
