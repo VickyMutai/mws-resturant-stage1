@@ -411,6 +411,7 @@ nav h1 a {
 #favorite{
   margin-top: -40px;
 }
+html{overflow-x: hidden;}
 #restaurant-name {
   color: #000000;
   font-family: Arial,sans-serif;
